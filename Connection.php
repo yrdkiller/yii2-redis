@@ -647,8 +647,13 @@ class Connection extends Component
         }
 
         \Yii::trace("Executing Redis Command: {$name}", __METHOD__);
-        fwrite($this->_socket, $command);
 
+        $len = strlen($command);
+        for($i=0; $i < $len; $i+=8192) {
+            $str = substr($command, $i, 8192);
+            fwrite($this->_socket, $str);
+        }
+        
         return $this->parseResponse(implode(' ', $params));
     }
 
